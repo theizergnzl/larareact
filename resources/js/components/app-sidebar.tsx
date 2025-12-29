@@ -7,6 +7,10 @@ import {
   LifeBuoy,
   Send,
   SquareTerminal,
+  Shield,
+  History,
+  Users,
+  FileSpreadsheet,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -36,23 +40,23 @@ const data = {
       url: "/dashboard",
       icon: Home,
     },
+
     {
-      title: "Projects",
+      title: "Histórico",
       url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      icon: Shield,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Historial de Sesiones",
+          url: "/admin/session-history",
         },
       ],
     },
-  {
-      title: "Design Engineering",
-      url: "#",
-      icon: Frame,
-  },
+    {
+      title: "Reportes",
+      url: "/reports",
+      icon: FileSpreadsheet,
+    },
   ],
   navSecondary: [
     {

@@ -44,4 +44,12 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Relación con el historial de sesiones
+     */
+    public function sessionHistories()
+    {
+        return $this->hasMany(SessionHistory::class);
+    }
 }

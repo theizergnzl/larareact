@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\SessionHistory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +42,18 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Registrar el cierre de sesión con ubicación si está disponible
+        if (Auth::check()) {
+            SessionHistory::create([
+                'user_id' => Auth::id(),
+                'action' => 'logout',
+                'ip_address' => $request->ip(),
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
+                'user_agent' => $request->userAgent(),
+            ]);
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

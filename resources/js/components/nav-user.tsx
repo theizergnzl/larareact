@@ -1,9 +1,11 @@
 "use client"
 
+import { useState } from "react";
 import {
   BadgeCheck,
   ChevronsUpDown,
   LogOut,
+  History,
 } from "lucide-react"
 
 import {
@@ -26,7 +28,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import {User} from "@/types";
-import {Link} from "@inertiajs/react";
+import {Link, useForm} from "@inertiajs/react";
+import { useGeolocation } from "@/hooks/use-geolocation";
+import axios from "axios";
 
 export function NavUser({
   user,
@@ -34,6 +38,35 @@ export function NavUser({
   user: User
 }) {
   const { isMobile } = useSidebar()
+  const { getCurrentPosition } = useGeolocation();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { post } = useForm({});
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      // Obtener ubicación antes de cerrar sesión
+      const position = await getCurrentPosition();
+      
+      // Registrar el cierre de sesión con ubicación
+      await axios.post(route("session-history.store"), {
+        action: "logout",
+        latitude: position.latitude,
+        longitude: position.longitude,
+      });
+      
+      // Cerrar sesión enviando la ubicación
+      post(route("logout"), {
+        data: {
+          latitude: position.latitude,
+          longitude: position.longitude,
+        },
+      });
+    } catch (error) {
+      // Si hay error al obtener la ubicación, cerrar sesión de todas formas
+      post(route("logout"));
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -81,19 +114,21 @@ export function NavUser({
                   Edit Profile
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={route('session-history.index')}>
+                  <History />
+                  Session History
+                </Link>
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem asChild>
-              <Link
-                  className="w-full"
-                  href={route("logout")}
-                  method={"post"}
-                  as={"button"}
-              >
-                <LogOut />
-                Log out
-              </Link>
+            <DropdownMenuItem 
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              <LogOut />
+              {isLoggingOut ? "Cerrando sesión..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
