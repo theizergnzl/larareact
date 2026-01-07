@@ -96,7 +96,7 @@ export default function DeleteUserForm({
       </CardHeader>
       <CardFooter>
         <Dialog>
-          <DialogTrigger>
+          <DialogTrigger asChild>
             <Button variant="destructive" onClick={confirmUserDeletion}>
               Delete Account
             </Button>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/Components/ui/card";
 import {
   Table,
   TableBody,
@@ -15,14 +14,13 @@ import { Plus, Trash2 } from "lucide-react";
 import Paginations from "@/Components/Pagination";
 import { router } from "@inertiajs/react";
 import { useDebouncedCallback } from "use-debounce";
-import { Checkbox } from "@/Components/ui/checkbox";
-
-interface Column<T> {
-  key: string;
-  label: string;
-  className?: string;
-  render?: (item: T) => React.ReactNode;
-}
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  Column,
+} from "@tanstack/react-table";
 
 interface DataTableProps<T> {
   data: {
@@ -38,7 +36,7 @@ interface DataTableProps<T> {
       links: { url: string | null; label: string; active: boolean }[];
     };
   };
-  columns: Column<T>[];
+  columns: ColumnDef<T>[];
   searchPlaceholder?: string;
   routePrefix: string;
   filters?: Record<string, any>;
@@ -46,9 +44,6 @@ interface DataTableProps<T> {
     label: string;
     sheet: React.ReactNode;
   };
-  selectable?: boolean;
-  onSelectionChange?: (selectedIds: number[]) => void;
-  onBulkDelete?: (selectedIds: number[]) => void;
 }
 
 export function DataTableWrapper<T extends { id: number; [key: string]: any }>({
@@ -58,17 +53,14 @@ export function DataTableWrapper<T extends { id: number; [key: string]: any }>({
   routePrefix,
   filters,
   createButton,
-  selectable = false,
-  onSelectionChange,
-  onBulkDelete,
 }: DataTableProps<T>) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
-  useEffect(() => {
-    setSelectedRows([]);
-    onSelectionChange?.([]);
-  }, [data.data]);
+  const table = useReactTable({
+    data: data.data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   const handleSearch = useDebouncedCallback((term: string) => {
     router.get(
@@ -82,20 +74,6 @@ export function DataTableWrapper<T extends { id: number; [key: string]: any }>({
     );
   }, 300);
 
-  const handleSelectAll = (checked: boolean) => {
-    const newSelectedRows = checked ? data.data.map((item) => item.id) : [];
-    setSelectedRows(newSelectedRows);
-    onSelectionChange?.(newSelectedRows);
-  };
-
-  const handleSelectRow = (checked: boolean, id: number) => {
-    const newSelectedRows = checked
-      ? [...selectedRows, id]
-      : selectedRows.filter((rowId) => rowId !== id);
-    setSelectedRows(newSelectedRows);
-    onSelectionChange?.(newSelectedRows);
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex gap-4 justify-between">
@@ -107,17 +85,6 @@ export function DataTableWrapper<T extends { id: number; [key: string]: any }>({
             defaultValue={filters?.search}
             onChange={(e) => handleSearch(e.target.value)}
           />
-          {selectable && selectedRows.length > 0 && onBulkDelete && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => onBulkDelete(selectedRows)}
-            >
-              <Trash2 className="mr-2 size-4" />
-              <span className="hidden md:block">Delete Selected</span> (
-              {selectedRows.length})
-            </Button>
-          )}
         </div>
         {createButton && (
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -138,50 +105,39 @@ export function DataTableWrapper<T extends { id: number; [key: string]: any }>({
 
       <Table>
         <TableHeader>
-          <TableRow>
-            {selectable && (
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={
-                    data.data.length > 0 &&
-                    selectedRows.length === data.data.length
-                  }
-                  onCheckedChange={handleSelectAll}
-                  aria-label="Select all"
-                />
-              </TableHead>
-            )}
-            {columns.map((column) => (
-              <TableHead key={column.key} className={column.className}>
-                {column.label}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.data.map((item) => (
-            <TableRow key={item.id}>
-              {selectable && (
-                <TableCell className="w-12">
-                  <Checkbox
-                    checked={selectedRows.includes(item.id)}
-                    onCheckedChange={(checked: boolean) =>
-                      handleSelectRow(checked, item.id)
-                    }
-                    aria-label={`Select row ${item.id}`}
-                  />
-                </TableCell>
-              )}
-              {columns.map((column) => (
-                <TableCell
-                  key={`${item.id}-${column.key}`}
-                  className={column.className}
-                >
-                  {column.render ? column.render(item) : item[column.key]}
-                </TableCell>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
               ))}
             </TableRow>
           ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
 

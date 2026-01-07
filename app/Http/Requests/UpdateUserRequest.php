@@ -19,8 +19,12 @@ class UpdateUserRequest extends FormRequest
         $id = $this->route()->parameter('id');
         return [
             'name' => 'sometimes|string|max:255',
+            'username' => 'sometimes|string|max:255|unique:users,username,'.$id,
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users')->ignore((int)$id)],
-            'password' => 'sometimes|min:8',
+            'password' => 'nullable|min:8',
+            'status' => 'sometimes|in:active,inactive,suspended',
+            'role' => 'sometimes|string|exists:roles,name',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 }

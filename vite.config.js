@@ -1,16 +1,19 @@
-import { defineConfig } from "vite";
-import laravel from "laravel-vite-plugin";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+// import wayfinder from '@laravel/vite-plugin-wayfinder'; // Temporalmente comentado
 
 export default defineConfig({
-  server: {
-    cors: true, // Enable CORS
-  },
-  plugins: [
-    laravel({
-      input: "resources/js/app.tsx",
-      refresh: true,
-    }),
-    react(),
-  ],
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.tsx'],
+            refresh: true,
+        }),
+        react(),
+        tailwindcss(),
+    ],
+    alias: {
+        '@': '/resources/js',
+    },
 });

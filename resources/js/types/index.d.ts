@@ -1,11 +1,14 @@
 export interface User {
   id: number;
   name: string;
+  username?: string | null;
   email: string;
+  status?: 'active' | 'inactive' | 'suspended';
   avatar?: string | null;
   email_verified_at: string;
   roles: string[];
   created_at: string;
+  updated_at: string;
 }
 
 export interface Site {
@@ -50,6 +53,14 @@ export interface UsersPageProps extends PageProps {
   roles: string[];
   filters: {
     search?: string;
+    status?: string;
+    per_page?: number;
+  };
+  statistics: {
+    total: number;
+    active: number;
+    inactive: number;
+    suspended: number;
   };
   flash: {
     success?: string;

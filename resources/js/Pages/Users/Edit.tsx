@@ -19,32 +19,46 @@ interface User {
 }
 
 interface EditProps extends PageProps {
-  user: {
-    data: User;
-  };
+  user_data?: User;
+  user?: User;
 }
 
 export default function EditUser({ auth }: PageProps) {
-  const { user } = usePage<EditProps>().props;
+  const { user_data, user } = usePage<EditProps>().props;
+
+  // Usar user_data si está disponible, si no usar user
+  const userData = user_data || user;
+
+  if (!userData) {
+    return <div>Loading...</div>;
+  }
 
   const { data, setData, patch, errors, processing } = useForm({
-    name: user.data.name,
-    email: user.data.email,
+    name: userData.name,
+    email: userData.email,
   });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    patch(route("users.update", user.data.id), {
+    patch(route("users.update", userData.id), {
       preserveScroll: true,
       onSuccess: () => {
         // Update the page props with the new data
         const page = usePage<EditProps>();
-        page.props.user.data = {
-          ...page.props.user.data,
-          name: data.name,
-          email: data.email,
-        };
+        if (page.props.user_data) {
+          page.props.user_data = {
+            ...page.props.user_data,
+            name: data.name,
+            email: data.email,
+          };
+        } else if (page.props.user) {
+          page.props.user = {
+            ...page.props.user,
+            name: data.name,
+            email: data.email,
+          };
+        }
       },
     });
   };
@@ -52,26 +66,26 @@ export default function EditUser({ auth }: PageProps) {
   return (
     <AuthenticatedLayout
       auth_user={auth.user}
-      header={`${user.data.name} Settings`}
+      header={`${userData.name} Settings`}
     >
       <Head title="Profile" />
 
       <div className=" w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
         <div className="grid gap-6">
-          <UpdateAvatarForm user={user.data} />
+          <UpdateAvatarForm user={userData} />
           <UpdateProfileInformationForm
             mustVerifyEmail={false}
             status={status}
             className="max-w-xl"
-            user={user.data}
-            isAuthUser={auth.user.id === user.data.id}
+            user={userData}
+            isAuthUser={auth.user.id === userData.id}
           />
 
           <UpdatePasswordForm className="max-w-xl" isAdmin={true} />
 
           <DeleteUserForm
             className="max-w-xl"
-            userId={user.data.id}
+            userId={userData.id}
             isAdmin={true}
           />
         </div>

@@ -1,3 +1,4 @@
+import React from "react";
 import { usePage, Link } from "@inertiajs/react"; // Import Link from Inertia
 import { Slash } from "lucide-react";
 
@@ -52,20 +53,22 @@ export function Breadcrumbs({ user }: { user: User }) {
                 : `/${pathSegments.slice(0, index + 1).join("/")}`;
 
               return (
-                <BreadcrumbItem key={index}>
-                  {isLast ? (
-                    <BreadcrumbPage>{displayText}</BreadcrumbPage>
-                  ) : (
-                    <>
+                <React.Fragment key={index}>
+                  <BreadcrumbItem>
+                    {isLast ? (
+                      <BreadcrumbPage>{displayText}</BreadcrumbPage>
+                    ) : (
                       <Link className="hover:underline" href={href}>
                         <BreadcrumbPage>{displayText}</BreadcrumbPage>
                       </Link>
-                      <BreadcrumbSeparator>
-                        <Slash />
-                      </BreadcrumbSeparator>
-                    </>
+                    )}
+                  </BreadcrumbItem>
+                  {!isLast && (
+                    <BreadcrumbSeparator>
+                      <Slash />
+                    </BreadcrumbSeparator>
                   )}
-                </BreadcrumbItem>
+                </React.Fragment>
               );
             })}
           </>

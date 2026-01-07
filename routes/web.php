@@ -29,7 +29,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/users/{id}', [UserController::class, 'findById'])->name('users.show');
         Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
         Route::patch('/users/{id}', [UserController::class, 'update'])->name('users.update');
-        // Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::get('/users/{id}/modal', [UserController::class, 'getUserForModal'])->name('users.modal');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::delete('/users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
 });
 

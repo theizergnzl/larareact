@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Carlos RGL',
+            'username' => 'admin',
             'email' => 'contact@carlosrgl.com',
+            'status' => 'active',
             'password' => '$2y$10$3Q6Q6Z'
 
         ]);

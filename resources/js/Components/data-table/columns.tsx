@@ -9,14 +9,21 @@ import { Link } from "@inertiajs/react";
 export type User = {
   id: number;
   name: string;
+  username: string | null;
   email: string;
+  status: 'active' | 'inactive' | 'suspended';
   created_at: string;
   updated_at: string;
   avatar: string | null;
   roles: string[];
 };
 
-export const columns: ColumnDef<User>[] = [
+interface ColumnProps {
+  onEdit?: (user: User) => void;
+  onDelete?: (user: User) => void;
+}
+
+export const createColumns = ({ onEdit, onDelete }: ColumnProps = {}): ColumnDef<User>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -68,7 +75,34 @@ export const columns: ColumnDef<User>[] = [
             <div className="hidden text-sm text-muted-foreground md:inline">
               {user.email}
             </div>
+            {user.username && (
+              <div className="text-xs text-muted-foreground">
+                @{user.username}
+              </div>
+            )}
           </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const status = row.original.status;
+      const variant = {
+        active: "default",
+        inactive: "secondary",
+        suspended: "destructive"
+      }[status] as "default" | "secondary" | "destructive";
+
+      return (
+        <div className="text-center">
+          <Badge className="text-xs" variant={variant}>
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </Badge>
         </div>
       );
     },
@@ -126,14 +160,14 @@ export const columns: ColumnDef<User>[] = [
           actions={[
             {
               label: "Edit",
-              href: route("users.edit", user.id),
+              onClick: () => onEdit?.(user),
             },
             {
               label: "Delete",
               requiresConfirmation: true,
-              onClick: () => {
-                // Handle delete
-              },
+              onClick: () => onDelete?.(user),
+              variant: "destructive",
+              confirmationMessage: "¿Estás seguro de que quieres eliminar este usuario? Esta acción no se puede deshacer.",
             },
           ]}
         />
