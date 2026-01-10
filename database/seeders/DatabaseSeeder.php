@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             'username' => 'admin',
             'email' => 'contact@carlosrgl.com',
             'status' => 'active',
-            'password' => '$2y$10$3Q6Q6Z'
+            'password' => 'password'
 
         ]);
         // assign role user to the users

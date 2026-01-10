@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/Components/ui/card";
+import { Mail, Lock } from "lucide-react";
 
 export default function ResetPassword({
   token,
@@ -42,71 +43,96 @@ export default function ResetPassword({
 
   return (
     <GuestLayout>
-      <Head title="Reset Password" />
-      <Card>
-        <CardHeader>
-          <CardTitle>Reset Password?</CardTitle>
-          <CardDescription>
-            No problem. Just let us know your email address and we will email
-            you a password reset link that will allow you to choose a new one.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={submit} className="space-y-6">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                name="email"
-                value={data.email}
-                className="block mt-1 w-full"
-                autoComplete="username"
-                onChange={(e) => setData("email", e.target.value)}
-              />
-              <InputError message={errors.email} className="mt-2" />
+      <Head title="Restablecer Contraseña" />
+      <div className="w-full max-w-md">
+        <Card className="border-0 shadow-2xl shadow-primary/20 dark:shadow-primary/10 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-purple-500 to-pink-500" />
+          <CardHeader className="space-y-3 pb-6 pt-8">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <Lock className="h-8 w-8 text-white" />
             </div>
+            <CardTitle className="text-2xl font-bold text-center">Restablecer Contraseña</CardTitle>
+            <CardDescription className="text-center text-base">
+              Ingresa tu nueva contraseña para restablecerla.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 px-8 pb-8">
+            <form onSubmit={submit} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-semibold">
+                  Correo Electrónico
+                </Label>
+                <div className="relative group">
+                  <Mail className="absolute left-3 top-3.5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value={data.email}
+                    className="pl-11 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    autoComplete="username"
+                    placeholder="Ingresa tu correo electrónico"
+                    onChange={(e) => setData("email", e.target.value)}
+                  />
+                </div>
+                <InputError message={errors.email} className="mt-2" />
+              </div>
 
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                name="password"
-                value={data.password}
-                className="block mt-1 w-full"
-                autoComplete="new-password"
-                onChange={(e) => setData("password", e.target.value)}
-              />
-              <InputError message={errors.password} className="mt-2" />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-semibold">
+                  Contraseña
+                </Label>
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-3.5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input
+                    id="password"
+                    type="password"
+                    name="password"
+                    value={data.password}
+                    className="pl-11 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    autoComplete="new-password"
+                    placeholder="Ingresa tu nueva contraseña"
+                    onChange={(e) => setData("password", e.target.value)}
+                  />
+                </div>
+                <InputError message={errors.password} className="mt-2" />
+              </div>
 
-            <div>
-              <Label htmlFor="password_confirmation">Confirm Password</Label>
-              <Input
-                type="password"
-                name="password_confirmation"
-                value={data.password_confirmation}
-                className="block mt-1 w-full"
-                autoComplete="new-password"
-                onChange={(e) =>
-                  setData("password_confirmation", e.target.value)
-                }
-              />
-              <InputError
-                message={errors.password_confirmation}
-                className="mt-2"
-              />
-            </div>
-          </form>
-        </CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="password_confirmation" className="text-sm font-semibold">
+                  Confirmar Contraseña
+                </Label>
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-3.5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input
+                    type="password"
+                    name="password_confirmation"
+                    value={data.password_confirmation}
+                    className="pl-11 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    autoComplete="new-password"
+                    placeholder="Confirma tu nueva contraseña"
+                    onChange={(e) =>
+                      setData("password_confirmation", e.target.value)
+                    }
+                  />
+                </div>
+                <InputError
+                  message={errors.password_confirmation}
+                  className="mt-2"
+                />
+              </div>
 
-        <CardFooter className="px-6 py-4 border-t">
-          <Button className="" onClick={submit} disabled={processing}>
-            Reset Password
-          </Button>
-        </CardFooter>
-      </Card>
+              <Button
+                type="submit"
+                className="w-full h-12 text-base font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                disabled={processing}
+              >
+                {processing ? "Restableciendo..." : "Restablecer Contraseña"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </GuestLayout>
   );
 }

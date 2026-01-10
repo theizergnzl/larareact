@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/Components/theme-provider";
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
+import { Toaster } from "sonner";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -21,6 +22,7 @@ createInertiaApp({
     root.render(
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <App {...props} />
+        <Toaster position="top-center" richColors closeButton />
       </ThemeProvider>
     );
   },
@@ -28,3 +30,4 @@ createInertiaApp({
     color: "#4B5563",
   },
 });
+
